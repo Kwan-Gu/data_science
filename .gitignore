@@ -4,3 +4,5 @@
 ~$*.xlsx
 *.log
 **/~$*.pptx
+**/my_logs/
+**/checkpoint/
