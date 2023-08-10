@@ -214,4 +214,3 @@ class ViT(nn.Module):
         x = self.classification(x)  # (B, n_class)
         output = nn.Softmax()(x)
         return output
-
