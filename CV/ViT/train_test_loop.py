@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 
 
 # calculate the metric per mini-batch
@@ -48,7 +47,6 @@ def test_loop(dataloader, model, loss_fn, device="cpu"):
     # Unnecessary in this situation but added for best practices
     model.eval()
     size = len(dataloader.dataset)
-    num_batches = len(dataloader)
     loss, metric = 0, 0
     # Evaluating the model with torch.no_grad() ensures that no gradients are computed during test mode
     # also serves to reduce unnecessary gradient computations and memory usage for tensors with requires_grad=True

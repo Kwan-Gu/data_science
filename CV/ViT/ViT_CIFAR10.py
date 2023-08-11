@@ -8,22 +8,25 @@ import datetime as dt
 from copy import deepcopy
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
-from torchsummary import summary
 from torchvision import datasets
 from torchvision.transforms import Compose, ToTensor, Normalize
+import torchvision.transforms.functional as TVF
 
 from ViT_v1 import ViT
 from train_test_loop import train_loop, test_loop
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # 0. Config
+ROOT_PATH = "C:/Users/WHITE/Desktop/DATA/CIFAR10"  # C:/Users/BEGAS_15/Desktop/DATA/CIFAR10
 img_size = (3, 32, 32)  # 이미지 크기
 patch_size = 4  # 패치 크기
-num_patch2 = (img_size[-1] // patch_size) ** 2  # 패치 개수
 dim_model = 64  # 임베딩 벡터 차원
 num_heads = 8  # MHA의 헤드 개수
 n_enc_block = 6  # 인코더 블록 개수
@@ -31,24 +34,23 @@ batch_size = 128
 MODEL_PATH = pathlib.Path("./models")
 
 os.makedirs(MODEL_PATH, exist_ok=True)
-os.makedirs(LOG_PATH, exist_ok=True)
 
 start = dt.datetime.now().strftime("%Y%m%d_%H%M")
 
 # 1. DATASETS & DATALOADERS
 # 1.1. Loading a Dataset
-train_dataset = datasets.CIFAR10(root="C:/Users/BEGAS_15/Desktop/DATA/CIFAR10",
+train_dataset = datasets.CIFAR10(root=ROOT_PATH,
                                  train=True,
                                  download=True,
                                  transform=Compose([ToTensor(), Normalize((0, 0, 0), (1, 1, 1))])
                                  )
-test_dataset = datasets.CIFAR10(root="C:/Users/BEGAS_15/Desktop/DATA/CIFAR10",
+test_dataset = datasets.CIFAR10(root=ROOT_PATH,
                                 train=False,
                                 download=True,
                                 transform=Compose([ToTensor(), Normalize((0, 0, 0), (1, 1, 1))])
                                 )
 n_class = len(train_dataset.classes)  # 클래스 개수
-"""
+
 # [Optional] Iterating and Visualizing the Dataset
 labels_map = {v: k for k, v in train_dataset.class_to_idx.items()}
 figure = plt.figure()
@@ -63,7 +65,7 @@ for i in range(1, ncols * nrows + 1):
     plt.axis("off")
     plt.imshow(img.squeeze())
 plt.show()
-"""
+
 # 1.2. Preparing your data for training with DataLoaders
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
